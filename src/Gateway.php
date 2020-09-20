@@ -12,7 +12,6 @@ use Omnipay\Common\Message\RequestInterface;
  * @method RequestInterface authorize(array $options = array())
  * @method RequestInterface completeAuthorize(array $options = array())
  * @method RequestInterface capture(array $options = array())
- * @method RequestInterface purchase(array $options = array())
  * @method RequestInterface completePurchase(array $options = array())
  * @method RequestInterface refund(array $options = array())
  * @method RequestInterface fetchTransaction(array $options = [])
@@ -34,10 +33,45 @@ class Gateway extends AbstractGateway
         return [
             'terminalId' => '',
             'privateKey' => '',
-            'keyPassword' => '',
             'certificate' => '',
-            'testMode' => false,
+            'currency' => 'BGN',
+            'testMode' => true,
         ];
+    }
+
+    public function getTerminalId()
+    {
+        return $this->getParameter('terminalId');
+    }
+
+    public function setTerminalId($value)
+    {
+        return $this->setParameter('terminalId', $value);
+    }
+
+    public function getPrivateKey()
+    {
+        return $this->getParameter('privateKey');
+    }
+
+    public function setPrivateKey($value)
+    {
+        return $this->setParameter('privateKey', $value);
+    }
+
+    public function getCertificate()
+    {
+        return $this->getParameter('certificate');
+    }
+
+    public function setCertificate($value)
+    {
+        return $this->setParameter('certificate', $value);
+    }
+
+    public function purchase(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\PurchaseRequest', $parameters);
     }
 
     public function __call($name, $arguments)
@@ -46,7 +80,6 @@ class Gateway extends AbstractGateway
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface authorize(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface completeAuthorize(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface capture(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface purchase(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface completePurchase(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface refund(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface fetchTransaction(array $options = [])

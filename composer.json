@@ -25,10 +25,13 @@
         }
     },
     "require": {
+        "php": "^7",
         "omnipay/common": "^3",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
+        "omnipay/tests": "^3"
     },
     "extra": {
         "branch-alias": {

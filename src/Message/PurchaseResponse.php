@@ -10,11 +10,14 @@ use Omnipay\Common\Message\RedirectResponseInterface;
 class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
     /**
-     * @return bool
+     * When you do a `purchase` the request is never successful because
+     * you need to redirect off-site to complete the purchase.
+     *
+     * {@inheritdoc}
      */
     public function isSuccessful()
     {
-        return true;
+        return false;
     }
 
     /**

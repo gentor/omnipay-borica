@@ -8,9 +8,9 @@ use DateTime;
 
 class Signature
 {
-    const ALGO = "sha256WithRSAEncryption";
+    const ALGO = OPENSSL_ALGO_SHA256;
 
-    public static $macFields = [
+    public static $requestMacFields = [
         1 => [
             'TERMINAL',
             'TRTYPE',
@@ -25,15 +25,43 @@ class Signature
             'TIMESTAMP',
             'DESC',
         ],
+        90 => [
+            'TERMINAL',
+            'TRTYPE',
+            'ORDER',
+        ],
+    ];
+
+    public static $responseMacFields = [
+        1 => [
+            'TERMINAL',
+            'TRTYPE',
+            'AMOUNT',
+            'TIMESTAMP',
+        ],
+        12 => [
+            'TERMINAL',
+            'TRTYPE',
+            'AMOUNT',
+            'ORDER',
+            'TIMESTAMP',
+        ],
+        90 => [
+            'TERMINAL',
+            'TRTYPE',
+            'AMOUNT',
+            'TIMESTAMP',
+        ],
     ];
 
     public static function create($message, $privateKey)
     {
         $privateKeyId = openssl_get_privatekey($privateKey);
+
         openssl_sign($message, $signature, $privateKeyId, self::ALGO);
         openssl_free_key($privateKeyId);
 
-        return strtoupper(bin2hex($signature));
+        return bin2hex($signature);
     }
 
     public static function verify(array $data, $certificate)
@@ -42,23 +70,25 @@ class Signature
             return -1;
         }
 
-        $message = self::getMacSourceValue($data);
+        $message = self::getMacSourceValue($data, true);
         $signature = hex2bin($data['P_SIGN']);
         $publicKeyId = openssl_get_publickey($certificate);
 
         return openssl_verify($message, $signature, $publicKeyId, self::ALGO);
     }
 
-    public static function getMacSourceValue(array $data)
+    public static function getMacSourceValue(array $data, $isResponse = false)
     {
+        $macFields = $isResponse ? self::$responseMacFields : self::$requestMacFields;
+
         $type = $data['TRTYPE'];
         $message = '';
 
-        foreach (self::$macFields[$type] as $field) {
+        foreach ($macFields[$type] as $field) {
             $message .= strlen($data[$field]) . $data[$field];
         }
 
-        return strtoupper(bin2hex($message));
+        return $message;
     }
 
     /**
@@ -137,6 +167,10 @@ class Signature
     {
 //        $parsed = openssl_x509_read($certificate);
         $parsed = openssl_x509_parse($certificate, false);
+        if ($parsed === false) {
+            return false;
+        }
+
         $publicKey = openssl_get_publickey($certificate);
         $details = openssl_pkey_get_details($publicKey);
         $publicKey = [
@@ -151,6 +185,7 @@ class Signature
             'issuer' => $parsed['issuer'],
             'validFrom' => date(DateTime::ISO8601, $parsed['validFrom_time_t']),
             'validTo' => date(DateTime::ISO8601, $parsed['validTo_time_t']),
+            'isExpired' => $parsed['validTo_time_t'] < time(),
             'serialNumberHex' => $parsed['serialNumberHex'],
             'fingerprint' => [
                 'md5' => wordwrap(strtoupper(openssl_x509_fingerprint($certificate, 'md5')), 2, ':', true),

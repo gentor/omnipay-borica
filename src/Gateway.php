@@ -9,12 +9,9 @@ use Omnipay\Common\Message\RequestInterface;
 
 /**
  * @method NotificationInterface acceptNotification(array $options = array())
- * @method RequestInterface authorize(array $options = array())
  * @method RequestInterface completeAuthorize(array $options = array())
  * @method RequestInterface capture(array $options = array())
- * @method RequestInterface completePurchase(array $options = array())
  * @method RequestInterface refund(array $options = array())
- * @method RequestInterface fetchTransaction(array $options = [])
  * @method RequestInterface void(array $options = array())
  * @method RequestInterface createCard(array $options = array())
  * @method RequestInterface updateCard(array $options = array())
@@ -31,11 +28,9 @@ class Gateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return [
-            'terminalId' => '',
-            'privateKey' => '',
-            'certificate' => '',
             'currency' => 'BGN',
             'testMode' => true,
+            'gatewayCertificate' => file_get_contents(__DIR__ . '/../resources/MPI_OW_APGW_B-Trust.cer'),
         ];
     }
 
@@ -69,20 +64,58 @@ class Gateway extends AbstractGateway
         return $this->setParameter('certificate', $value);
     }
 
+    public function getGatewayCertificate()
+    {
+        return $this->getParameter('gatewayCertificate');
+    }
+
+    public function setGatewayCertificate($value)
+    {
+        return $this->setParameter('gatewayCertificate', $value);
+    }
+
+    /**
+     * @param array $parameters
+     * @return Message\AuthorizeRequest|\Omnipay\Common\Message\AbstractRequest
+     */
+    public function authorize(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\AuthorizeRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return Message\PurchaseRequest|\Omnipay\Common\Message\AbstractRequest
+     */
     public function purchase(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Borica\Message\PurchaseRequest', $parameters);
     }
 
+    /**
+     * @param array $parameters
+     * @return Message\CompletePurchaseRequest|\Omnipay\Common\Message\AbstractRequest
+     */
+    public function completePurchase(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\CompletePurchaseRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return Message\PurchaseRequest|\Omnipay\Common\Message\AbstractRequest
+     */
+    public function fetchTransaction(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\FetchTransactionRequest', $parameters);
+    }
+
     public function __call($name, $arguments)
     {
         // TODO: Implement @method \Omnipay\Common\Message\NotificationInterface acceptNotification(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface authorize(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface completeAuthorize(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface capture(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface completePurchase(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface refund(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface fetchTransaction(array $options = [])
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface void(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())

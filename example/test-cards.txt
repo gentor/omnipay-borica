@@ -1,0 +1,28 @@
+5100770000000022 Response code = 00
+4341792000000044 Response code = 00 3DS pass: 111111
+5555000000070019 Response code = 04
+5555000000070027 Response code = 13
+5555000000070035 Response code = 91
+
+4010119999999897 Response code = amount dependant
+5100789999999895 Response code = amount dependant 3DS pass: 111111
+
+AMOUNT                  RC      RC DESCRIPTION
+---------------------------------------------------------------
+1.00     - 1.99         01      Refer to card issuer
+2.00     - 2.99         04      Pick Up
+3.00     - 3.99         05      Do not Honour
+4.00     - 4.99         13      Invalid amount
+5.00     - 5.99         30      Format error
+6.00     - 6.99         91      Issuer or switch is inoperative
+7.00     - 7.99         96      System Malfunction
+8.00     - 8.99                 Timeout
+30.00    - 40.00        01      Refer to card issuer
+50.00    - 70.00        04      Pick Up
+80.00    - 90.00        05      Do not Honour
+100.00   - 110.00       13      Invalid amount
+120.00   - 130.00       30      Format error
+140.00   - 150.00       91      Issuer or switch is inoperative
+160.00   - 170.00       96      System Malfunction
+180.00   - 190.00               Timeout
+10000.65 - 10000.65     65/1A   Soft Decline

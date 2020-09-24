@@ -12,19 +12,35 @@ class PurchaseRequest extends AbstractRequest
     {
         $data = parent::getData();
 
+        $this->validate('amount', 'currency', 'order', 'description', 'merchantUrl', 'returnUrl');
+
         $data = array_merge($data, [
             'TRTYPE' => 1,
             'AMOUNT' => $this->getAmount(),
+            'CURRENCY' => $this->getCurrency(),
             'MERCH_URL' => $this->getMerchantUrl(),
+            'MERCH_NAME' => $this->getMerchantName() ?: $this->getMerchantUrl(),
             'BACKREF' => $this->getReturnUrl(),
-            'NONCE' => $this->getNonce() ?: $data['NONCE'],
+            'NONCE' => $this->getNonce() ?: bin2hex(microtime(true)),
             'ORDER' => $this->getOrder(),
             'DESC' => $this->getDescription(),
+            'AD.CUST_BOR_ORDER_ID' => $this->getOrder() . '|' . $this->getOrderId(),
+            'ADDENDUM' => 'AD,TD',
         ]);
 
-        $this->validate($data);
+        $data['P_SIGN'] = $this->sign($data);
 
         return $data;
+    }
+
+    /**
+     * Send the request
+     *
+     * @return PurchaseResponse|\Omnipay\Common\Message\ResponseInterface
+     */
+    public function send()
+    {
+        return parent::send();
     }
 
     public function getOrder()
@@ -35,6 +51,16 @@ class PurchaseRequest extends AbstractRequest
     public function setOrder($value)
     {
         return $this->setParameter('order', $value);
+    }
+
+    public function getOrderId()
+    {
+        return $this->getParameter('orderId');
+    }
+
+    public function setOrderId($value)
+    {
+        return $this->setParameter('orderId', $value);
     }
 
     public function getNonce()
@@ -52,9 +78,19 @@ class PurchaseRequest extends AbstractRequest
         return $this->getParameter('merchantUrl');
     }
 
-    public function gstMerchantUrl($value)
+    public function setMerchantUrl($value)
     {
         return $this->setParameter('merchantUrl', $value);
+    }
+
+    public function getMerchantName()
+    {
+        return $this->getParameter('merchantName');
+    }
+
+    public function setMerchantName($value)
+    {
+        return $this->setParameter('merchantName', $value);
     }
 
     /**
@@ -63,8 +99,6 @@ class PurchaseRequest extends AbstractRequest
      */
     public function sendData($data)
     {
-        $data['P_SIGN'] = $this->sign($data);
-
 //        $httpClient = new Client();
 //
 //        try {

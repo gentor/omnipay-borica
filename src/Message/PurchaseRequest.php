@@ -4,7 +4,7 @@
 namespace Omnipay\Borica\Message;
 
 
-use GuzzleHttp\Client;
+use Omnipay\Common\Message\ResponseInterface;
 
 class PurchaseRequest extends AbstractRequest
 {
@@ -36,21 +36,11 @@ class PurchaseRequest extends AbstractRequest
     /**
      * Send the request
      *
-     * @return PurchaseResponse|\Omnipay\Common\Message\ResponseInterface
+     * @return PurchaseResponse|ResponseInterface
      */
     public function send()
     {
         return parent::send();
-    }
-
-    public function getOrder()
-    {
-        return $this->getParameter('order');
-    }
-
-    public function setOrder($value)
-    {
-        return $this->setParameter('order', $value);
     }
 
     public function getOrderId()
@@ -61,16 +51,6 @@ class PurchaseRequest extends AbstractRequest
     public function setOrderId($value)
     {
         return $this->setParameter('orderId', $value);
-    }
-
-    public function getNonce()
-    {
-        return $this->getParameter('nonce');
-    }
-
-    public function setNonce($value)
-    {
-        return $this->setParameter('nonce', $value);
     }
 
     public function getMerchantUrl()
@@ -94,23 +74,11 @@ class PurchaseRequest extends AbstractRequest
     }
 
     /**
-     * @param array $data
+     * @param mixed $data
      * @return PurchaseResponse
      */
     public function sendData($data)
     {
-//        $httpClient = new Client();
-//
-//        try {
-//            $response = $httpClient->request('POST', $this->getEndpoint(), [
-//                'form_params' => $data,
-//            ]);
-//        } catch (\Exception $e) {
-//            dd($e);
-//        }
-//
-//        $tmp = $response->getBody();
-
         return $this->response = new PurchaseResponse($this, $data);
     }
 }

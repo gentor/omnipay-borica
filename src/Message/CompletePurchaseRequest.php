@@ -29,6 +29,10 @@ class CompletePurchaseRequest extends FetchTransactionRequest
 
     protected $gatewayData = [];
 
+    /**
+     * @return array|mixed
+     * @throws InvalidRequestException
+     */
     public function getData()
     {
         $this->validateGatewayData();
@@ -46,6 +50,9 @@ class CompletePurchaseRequest extends FetchTransactionRequest
         return $this->gatewayData;
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     public function validateGatewayData()
     {
         foreach ($this->gatewayFields as $gatewayField) {
@@ -59,6 +66,22 @@ class CompletePurchaseRequest extends FetchTransactionRequest
         }
 
         $this->validateGatewaySignature($this->gatewayData);
+    }
+
+    /**
+     * @param array $data
+     * @throws InvalidRequestException
+     */
+    public function validateGatewaySignature(array $data)
+    {
+        if (!$this->getGatewayCertificate()) {
+            return;
+        }
+
+        $valid = Signature::verify($data, $this->getGatewayCertificate());
+        if ($valid < 1) {
+            throw new InvalidRequestException("Invalid gateway signature (P_SIGN): " . $data['P_SIGN']);
+        }
     }
 
     public function initialize(array $parameters = array())

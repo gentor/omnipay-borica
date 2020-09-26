@@ -5,10 +5,21 @@ namespace Omnipay\Borica\Message;
 
 
 use Omnipay\Common\Message\AbstractResponse;
-use Omnipay\Common\Message\ResponseInterface;
 
-class FetchTransactionResponse extends AbstractResponse implements ResponseInterface
+class FetchTransactionResponse extends AbstractResponse
 {
+    public function getData()
+    {
+        $this->data['isReversal'] = $this->isReversal();
+
+        return $this->data;
+    }
+
+    public function isReversal()
+    {
+        return $this->data['TRTYPE'] == RefundRequest::TR_TYPE;
+    }
+
     public function isSuccessful()
     {
         return $this->getCode() === '00';

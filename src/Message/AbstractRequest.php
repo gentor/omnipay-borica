@@ -12,6 +12,10 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     protected $liveEndpoint = 'https://3dsgate.borica.bg/cgi-bin/cgi_link';
     protected $testEndpoint = 'https://3dsgate-dev.borica.bg/cgi-bin/cgi_link';
 
+    /**
+     * @return array|mixed
+     * @throws InvalidRequestException
+     */
     public function getData()
     {
         $this->validate('terminalId', 'privateKey');
@@ -64,6 +68,36 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('gatewayCertificate', $value);
     }
 
+    public function setDesc($value)
+    {
+        return $this->setDescription($value);
+    }
+
+    public function setCard($value)
+    {
+        return $this->setParameter('card', $value);
+    }
+
+    public function getOrder()
+    {
+        return $this->getParameter('order');
+    }
+
+    public function setOrder($value)
+    {
+        return $this->setParameter('order', $value);
+    }
+
+    public function getNonce()
+    {
+        return $this->getParameter('nonce');
+    }
+
+    public function setNonce($value)
+    {
+        return $this->setParameter('nonce', $value);
+    }
+
     protected function sign($data)
     {
         $message = Signature::getMacSourceValue($data);
@@ -76,6 +110,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     public function validatePrivateKey()
     {
         $result = openssl_get_privatekey($this->getPrivateKey());
@@ -84,6 +121,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         }
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     public function validateCertificate()
     {
         $result = Signature::parseCertificate($this->getCertificate());

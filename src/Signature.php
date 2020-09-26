@@ -25,6 +25,13 @@ class Signature
             'TIMESTAMP',
             'DESC',
         ],
+        24 => [
+            'TERMINAL',
+            'TRTYPE',
+            'AMOUNT',
+            'TIMESTAMP',
+            'DESC',
+        ],
         90 => [
             'TERMINAL',
             'TRTYPE',
@@ -40,6 +47,13 @@ class Signature
             'TIMESTAMP',
         ],
         12 => [
+            'TERMINAL',
+            'TRTYPE',
+            'AMOUNT',
+            'ORDER',
+            'TIMESTAMP',
+        ],
+        24 => [
             'TERMINAL',
             'TRTYPE',
             'AMOUNT',

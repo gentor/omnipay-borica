@@ -1,7 +1,7 @@
 {
     "name": "gentor/omnipay-borica",
     "type": "library",
-    "description": "Borica gateway for Omnipay payment processing library",
+    "description": "Borica Way4 gateway for Omnipay payment processing library",
     "keywords": [
         "gateway",
         "merchant",

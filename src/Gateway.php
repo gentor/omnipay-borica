@@ -4,6 +4,7 @@ namespace Omnipay\Borica;
 
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Common\Message\AbstractRequest;
 use Omnipay\Common\Message\NotificationInterface;
 use Omnipay\Common\Message\RequestInterface;
 
@@ -11,7 +12,6 @@ use Omnipay\Common\Message\RequestInterface;
  * @method NotificationInterface acceptNotification(array $options = array())
  * @method RequestInterface completeAuthorize(array $options = array())
  * @method RequestInterface capture(array $options = array())
- * @method RequestInterface refund(array $options = array())
  * @method RequestInterface void(array $options = array())
  * @method RequestInterface createCard(array $options = array())
  * @method RequestInterface updateCard(array $options = array())
@@ -76,7 +76,7 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
-     * @return Message\AuthorizeRequest|\Omnipay\Common\Message\AbstractRequest
+     * @return Message\AuthorizeRequest|AbstractRequest
      */
     public function authorize(array $parameters = array())
     {
@@ -85,7 +85,7 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
-     * @return Message\PurchaseRequest|\Omnipay\Common\Message\AbstractRequest
+     * @return Message\PurchaseRequest|AbstractRequest
      */
     public function purchase(array $parameters = array())
     {
@@ -94,7 +94,7 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
-     * @return Message\CompletePurchaseRequest|\Omnipay\Common\Message\AbstractRequest
+     * @return Message\CompletePurchaseRequest|AbstractRequest
      */
     public function completePurchase(array $parameters = array())
     {
@@ -103,11 +103,20 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
-     * @return Message\PurchaseRequest|\Omnipay\Common\Message\AbstractRequest
+     * @return Message\FetchTransactionRequest|AbstractRequest
      */
     public function fetchTransaction(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Borica\Message\FetchTransactionRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return Message\RefundRequest|AbstractRequest
+     */
+    public function refund(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\RefundRequest', $parameters);
     }
 
     public function __call($name, $arguments)
@@ -115,7 +124,6 @@ class Gateway extends AbstractGateway
         // TODO: Implement @method \Omnipay\Common\Message\NotificationInterface acceptNotification(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface completeAuthorize(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface capture(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface refund(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface void(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())

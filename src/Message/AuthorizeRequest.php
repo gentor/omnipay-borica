@@ -20,7 +20,7 @@ class AuthorizeRequest extends PurchaseRequest
     }
 
     /**
-     * @param array $data
+     * @param mixed $data
      * @return PurchaseResponse
      */
     public function sendData($data)

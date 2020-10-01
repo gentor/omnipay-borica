@@ -68,6 +68,16 @@ class Signature
         ],
     ];
 
+    public static $csrFields = [
+        'commonName',
+        'countryName',
+        'localityName',
+        'emailAddress',
+        'organizationName',
+        'stateOrProvinceName',
+        'organizationalUnitName',
+    ];
+
     public static function create($message, $privateKey)
     {
         $privateKeyId = openssl_get_privatekey($privateKey);
@@ -138,15 +148,21 @@ class Signature
      * @param string $state
      * @return array
      */
-    public static function generateCSR($privateKey, $terminalId, $domain, $organization = 'Omnipay Borica', $state = 'BG')
+    public static function generateCSR($privateKey, $terminalId, $domain, array $subject = ['organizationName' => 'Omnipay Borica'])
     {
         $dn = [
-            'commonName' => $domain,
             'organizationalUnitName' => $terminalId,
+            'commonName' => $domain,
             'countryName' => 'BG',
-            'organizationName' => $organization,
-            'stateOrProvinceName' => $state,
+            'localityName' => 'BG',
+            'stateOrProvinceName' => 'BG',
         ];
+
+        foreach ($subject as $key => $value) {
+            if (in_array($key, self::$csrFields)) {
+                $dn[$key] = $value;
+            }
+        }
 
         $privkey = openssl_get_privatekey($privateKey);
         $resource = openssl_csr_new($dn, $privkey, ['digest_alg' => self::ALGO]);

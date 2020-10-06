@@ -4,6 +4,7 @@
 namespace Omnipay\Borica\Message;
 
 
+use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
 
 class FetchTransactionRequest extends AbstractRequest
@@ -57,6 +58,7 @@ class FetchTransactionRequest extends AbstractRequest
     /**
      * @param mixed $data
      * @return FetchTransactionResponse
+     * @throws InvalidRequestException
      */
     public function sendData($data)
     {
@@ -71,7 +73,33 @@ class FetchTransactionRequest extends AbstractRequest
             http_build_query($data)
         );
 
-        $responseData = (array)json_decode($response->getBody()->getContents());
+        $responseContents = $response->getBody()->getContents();
+        $responseData = json_decode($responseContents, true);
+
+        if (is_null($responseData)) {
+            preg_match_all('/input\s+type="hidden"\s+name="([^"]*)"\s+value="([^"]*)"/', $responseContents, $matches);
+            $result = array_combine($matches[1], $matches[2]);
+            preg_match('/Error message:\s+([^\n]*)/', $responseContents, $error);
+
+            if (!empty($error[1])) {
+                $signature = $result['P_SIGN'] ?? null;
+                unset($result['P_SIGN']);
+
+                return $this->response = new FetchTransactionResponse($this, array_merge($result, [
+                    'TERMINAL' => $result['TERMINAL'] ?? $this->getTerminalId(),
+                    'TIMESTAMP' => $result['TIMESTAMP'] ?? $data['TIMESTAMP'],
+                    'TRTYPE' => $this->getTransactionType(),
+                    'AMOUNT' => $this->getAmount(),
+                    'CURRENCY' => $this->getCurrency(),
+                    'NONCE' => $this->getNonce(),
+                    'ORDER' => $this->getOrder(),
+                    'DESC' => $this->getDescription(),
+                    'responseCode' => $result['RC'] ?? null,
+                    'statusMsg' => $error[1],
+                    'signature' => $signature,
+                ]));
+            }
+        }
 
         $data = array_merge($responseData, [
             'TRTYPE' => $this->getTransactionType(),

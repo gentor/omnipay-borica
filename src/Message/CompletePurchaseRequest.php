@@ -11,22 +11,6 @@ class CompletePurchaseRequest extends FetchTransactionRequest
 {
     protected $validTRTYPE = 1;
 
-    protected $gatewayFields = [
-        'TERMINAL',
-        'TRTYPE',
-        'ORDER',
-        'AMOUNT',
-        'CURRENCY',
-        'ACTION',
-        'RC',
-        'APPROVAL',
-        'RRN',
-        'INT_REF',
-        'TIMESTAMP',
-        'NONCE',
-        'P_SIGN',
-    ];
-
     protected $gatewayData = [];
 
     /**
@@ -35,6 +19,8 @@ class CompletePurchaseRequest extends FetchTransactionRequest
      */
     public function getData()
     {
+        parse_str($this->httpRequest->getContent(), $this->gatewayData);
+
         $this->validateGatewayData();
 
         return parent::getData();
@@ -55,12 +41,6 @@ class CompletePurchaseRequest extends FetchTransactionRequest
      */
     public function validateGatewayData()
     {
-        foreach ($this->gatewayFields as $gatewayField) {
-            if (!array_key_exists($gatewayField, $this->gatewayData)) {
-                throw new InvalidRequestException("Missing $gatewayField parameter");
-            }
-        }
-
         if ($this->gatewayData['TRTYPE'] != $this->validTRTYPE) {
             throw new InvalidRequestException("Invalid TRTYPE: {$this->gatewayData['TRTYPE']}, expected value is {$this->validTRTYPE}");
         }
@@ -78,20 +58,9 @@ class CompletePurchaseRequest extends FetchTransactionRequest
             return;
         }
 
-        $valid = Signature::verify($data, $this->getGatewayCertificate());
+        $valid = Signature::verify($data, $this->getGatewayCertificate(), $this->getSignScheme());
         if ($valid < 1) {
             throw new InvalidRequestException("Invalid gateway signature (P_SIGN): " . $data['P_SIGN']);
         }
-    }
-
-    public function initialize(array $parameters = array())
-    {
-        foreach ($this->gatewayFields as $gatewayField) {
-            if (array_key_exists($gatewayField, $parameters)) {
-                $this->gatewayData[$gatewayField] = $parameters[$gatewayField];
-            }
-        }
-
-        return parent::initialize($parameters);
     }
 }

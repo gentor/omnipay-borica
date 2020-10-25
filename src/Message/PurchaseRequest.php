@@ -19,7 +19,8 @@ class PurchaseRequest extends AbstractRequest
             'AMOUNT' => $this->getAmount(),
             'CURRENCY' => $this->getCurrency(),
             'MERCH_URL' => $this->getMerchantUrl(),
-            'MERCH_NAME' => $this->getMerchantName() ?: $this->getMerchantUrl(),
+            'MERCHANT' => $this->getMerchant() ?: $this->getMerchantUrl(),
+            'MERCHANT_NAME' => $this->getMerchantName() ?: $this->getMerchantUrl(),
             'BACKREF' => $this->getReturnUrl(),
             'NONCE' => $this->getNonce() ?: bin2hex(microtime(true)),
             'ORDER' => $this->getOrder(),
@@ -51,6 +52,16 @@ class PurchaseRequest extends AbstractRequest
     public function setOrderId($value)
     {
         return $this->setParameter('orderId', $value);
+    }
+
+    public function getMerchant()
+    {
+        return $this->getParameter('merchant');
+    }
+
+    public function setMerchant($value)
+    {
+        return $this->setParameter('merchant', $value);
     }
 
     public function getMerchantUrl()

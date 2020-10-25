@@ -98,9 +98,19 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('nonce', $value);
     }
 
+    public function getSignScheme()
+    {
+        return $this->getParameter('signScheme');
+    }
+
+    public function setSignScheme($value)
+    {
+        return $this->setParameter('signScheme', $value);
+    }
+
     protected function sign($data)
     {
-        $message = Signature::getMacSourceValue($data);
+        $message = Signature::getMacSourceValue($data, $this->getSignScheme());
 
         return Signature::create($message, $this->getPrivateKey());
     }

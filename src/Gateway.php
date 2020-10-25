@@ -31,6 +31,7 @@ class Gateway extends AbstractGateway
             'currency' => 'BGN',
             'testMode' => true,
             'gatewayCertificate' => file_get_contents(__DIR__ . '/../resources/MPI_OW_APGW_B-Trust.cer'),
+            'signScheme' => 'MAC_COMMON',
         ];
     }
 
@@ -72,6 +73,16 @@ class Gateway extends AbstractGateway
     public function setGatewayCertificate($value)
     {
         return $this->setParameter('gatewayCertificate', $value);
+    }
+
+    public function getSignScheme()
+    {
+        return $this->getParameter('signScheme');
+    }
+
+    public function setSignScheme($value)
+    {
+        return $this->setParameter('signScheme', $value);
     }
 
     /**

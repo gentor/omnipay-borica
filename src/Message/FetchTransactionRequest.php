@@ -5,11 +5,14 @@ namespace Omnipay\Borica\Message;
 
 
 use Omnipay\Common\Exception\InvalidRequestException;
+use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Common\Message\ResponseInterface;
 
 class FetchTransactionRequest extends AbstractRequest
 {
     const TR_TYPE = 90;
+
+    protected $invalidResponseData = [];
 
     public function getData()
     {
@@ -55,6 +58,11 @@ class FetchTransactionRequest extends AbstractRequest
         return $this->setParameter('transactionType', $value);
     }
 
+    public function getInvalidResponseData()
+    {
+        return $this->invalidResponseData;
+    }
+
     /**
      * @param mixed $data
      * @return FetchTransactionResponse
@@ -75,6 +83,10 @@ class FetchTransactionRequest extends AbstractRequest
 
         $responseContents = $response->getBody()->getContents();
         $responseData = json_decode($responseContents, true);
+        if (($responseData['responseCode'] ?? '') == -24) {
+            $this->invalidResponseData = $responseData;
+            throw new InvalidResponseException('Invalid gateway response code: -24');
+        }
 
         if (is_null($responseData)) {
             preg_match_all('/input\s+type="hidden"\s+name="([^"]*)"\s+value="([^"]*)"/', $responseContents, $matches);
@@ -94,6 +106,7 @@ class FetchTransactionRequest extends AbstractRequest
                     'NONCE' => $this->getNonce(),
                     'ORDER' => $this->getOrder(),
                     'DESC' => $this->getDescription(),
+                    'MERCHANT' => $this->getMerchant(),
                     'responseCode' => $result['RC'] ?? null,
                     'statusMsg' => $error[1],
                     'signature' => $signature,
@@ -105,6 +118,7 @@ class FetchTransactionRequest extends AbstractRequest
             'TRTYPE' => $this->getTransactionType(),
             'ORDER' => $this->getOrder(),
             'DESC' => $this->getDescription(),
+            'MERCHANT' => $this->getMerchant(),
         ]);
 
         return $this->response = new FetchTransactionResponse($this, $data);

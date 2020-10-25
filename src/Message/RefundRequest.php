@@ -11,6 +11,7 @@ class RefundRequest extends FetchTransactionRequest
     public function getData()
     {
         $data = parent::getData();
+        unset($data['TRAN_TRTYPE']);
 
         $this->validate('amount', 'currency', 'description', 'RRN', 'INT_REF');
 
@@ -25,6 +26,7 @@ class RefundRequest extends FetchTransactionRequest
             'DESC' => $this->getDescription(),
             'RRN' => $this->getRRN(),
             'INT_REF' => $this->getIntRef(),
+            'MERCHANT' => $this->getMerchant(),
         ]);
 
         $data['P_SIGN'] = $this->sign($data);

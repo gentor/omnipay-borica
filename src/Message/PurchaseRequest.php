@@ -54,16 +54,6 @@ class PurchaseRequest extends AbstractRequest
         return $this->setParameter('orderId', $value);
     }
 
-    public function getMerchant()
-    {
-        return $this->getParameter('merchant');
-    }
-
-    public function setMerchant($value)
-    {
-        return $this->setParameter('merchant', $value);
-    }
-
     public function getMerchantUrl()
     {
         return $this->getParameter('merchantUrl');

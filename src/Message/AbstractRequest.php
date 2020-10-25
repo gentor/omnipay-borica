@@ -98,6 +98,16 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('nonce', $value);
     }
 
+    public function getMerchant()
+    {
+        return $this->getParameter('merchant');
+    }
+
+    public function setMerchant($value)
+    {
+        return $this->setParameter('merchant', $value);
+    }
+
     public function getSignScheme()
     {
         return $this->getParameter('signScheme');

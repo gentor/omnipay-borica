@@ -151,7 +151,11 @@ class Signature
         $message = '';
 
         foreach ($macFields[$signScheme][$type] as $field) {
-            $message .= strlen($data[$field]) . $data[$field];
+            if ($signScheme == 'MAC_EXTENDED' && $data[$field] == '') {
+                $message .= '-';
+            } else {
+                $message .= strlen($data[$field]) . $data[$field];
+            }
         }
 
         return $message;

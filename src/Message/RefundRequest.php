@@ -86,10 +86,13 @@ class RefundRequest extends FetchTransactionRequest
             ]));
         }
 
-        $data = array_merge($data, $result, [
+        $data = [
+            'TERMINAL' => $this->getTerminalId(),
             'TRTYPE' => FetchTransactionRequest::TR_TYPE,
+            'ORDER' => $this->getOrder(),
+            'NONCE' => $this->getNonce(),
             'TRAN_TRTYPE' => self::TR_TYPE,
-        ]);
+        ];
 
         parent::setTransactionType(self::TR_TYPE);
 

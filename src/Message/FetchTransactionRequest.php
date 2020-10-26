@@ -119,6 +119,7 @@ class FetchTransactionRequest extends AbstractRequest
             'ORDER' => $this->getOrder(),
             'DESC' => $this->getDescription(),
             'MERCHANT' => $this->getMerchant(),
+            'card' => $responseData['card'] ?? $this->getCard(),
         ]);
 
         return $this->response = new FetchTransactionResponse($this, $data);

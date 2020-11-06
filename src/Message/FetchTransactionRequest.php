@@ -7,10 +7,13 @@ namespace Omnipay\Borica\Message;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Common\Message\ResponseInterface;
+use Ramsey\Uuid\Uuid;
 
 class FetchTransactionRequest extends AbstractRequest
 {
     const TR_TYPE = 90;
+    const GUARD_TIME = 900;
+    const GUARD_TIME_CHECK_CODE = -40;
 
     protected $invalidResponseData = [];
 
@@ -22,7 +25,6 @@ class FetchTransactionRequest extends AbstractRequest
 
         return array_merge($data, [
             'TRTYPE' => self::TR_TYPE,
-            'NONCE' => $this->getNonce() ?: bin2hex(microtime(true)),
             'ORDER' => $this->getOrder(),
             'TRAN_TRTYPE' => $this->getTransactionType(),
         ]);
@@ -36,16 +38,6 @@ class FetchTransactionRequest extends AbstractRequest
     public function setOrder($value)
     {
         return $this->setParameter('order', $value);
-    }
-
-    public function getNonce()
-    {
-        return $this->getParameter('nonce');
-    }
-
-    public function setNonce($value)
-    {
-        return $this->setParameter('nonce', $value);
     }
 
     public function getTransactionType()
@@ -66,7 +58,7 @@ class FetchTransactionRequest extends AbstractRequest
     /**
      * @param mixed $data
      * @return FetchTransactionResponse
-     * @throws InvalidRequestException
+     * @throws InvalidResponseException
      */
     public function sendData($data)
     {
@@ -85,7 +77,7 @@ class FetchTransactionRequest extends AbstractRequest
         $responseData = json_decode($responseContents, true);
         if (($responseData['responseCode'] ?? '') == -24) {
             $this->invalidResponseData = $responseData;
-            throw new InvalidResponseException('Invalid gateway response code: -24');
+            throw new InvalidResponseException('Gateway cache expired', -24);
         }
 
         if (is_null($responseData)) {
@@ -93,24 +85,26 @@ class FetchTransactionRequest extends AbstractRequest
             $result = array_combine($matches[1], $matches[2]);
             preg_match('/Error message:\s+([^\n]*)/', $responseContents, $error);
 
-            if (!empty($error[1])) {
-                $signature = $result['P_SIGN'] ?? null;
-                unset($result['P_SIGN']);
+            if (!empty($result) && !empty($error[1])) {
+                $this->invalidResponseData = $result;
+                throw new InvalidResponseException($error[1], $result['RC']);
+            } elseif (empty($result)) {
+                $this->invalidResponseData = ['contents' => $responseContents];
+                throw new InvalidResponseException('Invalid gateway response');
+            }
+        }
 
-                return $this->response = new FetchTransactionResponse($this, array_merge($result, [
-                    'TERMINAL' => $result['TERMINAL'] ?? $this->getTerminalId(),
-                    'TIMESTAMP' => $result['TIMESTAMP'] ?? $data['TIMESTAMP'],
-                    'TRTYPE' => $this->getTransactionType(),
-                    'AMOUNT' => $this->getAmount(),
-                    'CURRENCY' => $this->getCurrency(),
-                    'NONCE' => $this->getNonce(),
-                    'ORDER' => $this->getOrder(),
-                    'DESC' => $this->getDescription(),
-                    'MERCHANT' => $this->getMerchant(),
-                    'responseCode' => $result['RC'] ?? null,
-                    'statusMsg' => $error[1],
-                    'signature' => $signature,
-                ]));
+        if ($responseData['responseCode'] == self::GUARD_TIME_CHECK_CODE) {
+            try {
+                $originalTimestamp = Uuid::fromString($responseData['nonce'])->getDateTime()->getTimestamp();
+            } catch (\Exception $e) {
+                $originalTimestamp = time();
+            }
+            
+            if ((time() - $originalTimestamp) > self::GUARD_TIME) {
+//                throw new InvalidResponseException('Gateway guard time expired', self::GUARD_TIME_CHECK_CODE);
+                $responseData['responseCode'] = -17;
+                $responseData['statusMsg'] = 'Gateway guard time expired (' . self::GUARD_TIME . ' sec)';
             }
         }
 
@@ -129,6 +123,8 @@ class FetchTransactionRequest extends AbstractRequest
      * Send the request
      *
      * @return FetchTransactionResponse|ResponseInterface
+     * @throws InvalidRequestException
+     * @throws InvalidResponseException
      */
     public function send()
     {

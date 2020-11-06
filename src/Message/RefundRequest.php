@@ -21,7 +21,6 @@ class RefundRequest extends FetchTransactionRequest
             'ORG_AMOUNT' => $this->getAmount(),
             'CURRENCY' => $this->getCurrency(),
             'BACKREF' => $this->getReturnUrl(),
-            'NONCE' => $this->getNonce() ?: bin2hex(microtime(true)),
             'ORDER' => $this->getOrder(),
             'DESC' => $this->getDescription(),
             'RRN' => $this->getRRN(),
@@ -90,7 +89,7 @@ class RefundRequest extends FetchTransactionRequest
             'TERMINAL' => $this->getTerminalId(),
             'TRTYPE' => FetchTransactionRequest::TR_TYPE,
             'ORDER' => $this->getOrder(),
-            'NONCE' => $this->getNonce(),
+            'NONCE' => $data['NONCE'],
             'TRAN_TRTYPE' => self::TR_TYPE,
         ];
 

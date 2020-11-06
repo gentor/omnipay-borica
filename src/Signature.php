@@ -11,102 +11,24 @@ class Signature
     const ALGO = OPENSSL_ALGO_SHA256;
 
     public static $requestMacFields = [
-        'MAC_EXTENDED' => [
-            1 => [
-                'TERMINAL', 'TRTYPE',
-                'AMOUNT', 'CURRENCY',
-                'ORDER', 'MERCHANT',
-                'TIMESTAMP', 'NONCE',
-            ],
-            24 => [
-                'TERMINAL', 'TRTYPE',
-                'AMOUNT', 'CURRENCY',
-                'ORDER', 'MERCHANT',
-                'TIMESTAMP', 'NONCE',
-            ],
-            90 => [
-                'TERMINAL', 'TRTYPE',
-                'ORDER', 'NONCE',
-            ],
+        'default' => [
+            'TERMINAL', 'TRTYPE',
+            'AMOUNT', 'CURRENCY',
+            'ORDER', 'MERCHANT',
+            'TIMESTAMP', 'NONCE',
         ],
-        'MAC_COMMON' => [
-            1 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'CURRENCY',
-                'TIMESTAMP',
-            ],
-            12 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'TIMESTAMP',
-                'DESC',
-            ],
-            24 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'TIMESTAMP',
-                'DESC',
-            ],
-            90 => [
-                'TERMINAL',
-                'TRTYPE',
-                'ORDER',
-            ],
+        90 => [
+            'TERMINAL', 'TRTYPE',
+            'ORDER', 'NONCE',
         ],
     ];
 
     public static $responseMacFields = [
-        'MAC_EXTENDED' => [
-            1 => [
-                'ACTION', 'RC', 'APPROVAL', 'TERMINAL', 'TRTYPE',
-                'AMOUNT', 'CURRENCY', 'ORDER', 'RRN',
-                'INT_REF', 'PARES_STATUS', 'ECI', 'TIMESTAMP',
-                'NONCE',
-            ],
-            24 => [
-                'ACTION', 'RC', 'APPROVAL', 'TERMINAL', 'TRTYPE',
-                'AMOUNT', 'CURRENCY', 'ORDER', 'RRN',
-                'INT_REF', 'PARES_STATUS', 'ECI', 'TIMESTAMP',
-                'NONCE',
-            ],
-            90 => [
-                'ACTION', 'RC', 'APPROVAL', 'TERMINAL', 'TRTYPE',
-                'AMOUNT', 'CURRENCY', 'ORDER', 'RRN',
-                'INT_REF', 'PARES_STATUS', 'ECI', 'TIMESTAMP',
-                'NONCE',
-            ],
-        ],
-        'MAC_COMMON' => [
-            1 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'TIMESTAMP',
-            ],
-            12 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'ORDER',
-                'TIMESTAMP',
-            ],
-            24 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'ORDER',
-                'TIMESTAMP',
-            ],
-            90 => [
-                'TERMINAL',
-                'TRTYPE',
-                'AMOUNT',
-                'TIMESTAMP',
-            ],
+        'default' => [
+            'ACTION', 'RC', 'APPROVAL', 'TERMINAL', 'TRTYPE',
+            'AMOUNT', 'CURRENCY', 'ORDER', 'RRN',
+            'INT_REF', 'PARES_STATUS', 'ECI', 'TIMESTAMP',
+            'NONCE',
         ],
     ];
 
@@ -130,28 +52,29 @@ class Signature
         return bin2hex($signature);
     }
 
-    public static function verify(array $data, $certificate, $signScheme = 'MAC_EXTENDED')
+    public static function verify(array $data, $certificate)
     {
         if (empty($data['P_SIGN'])) {
             return -1;
         }
 
-        $message = self::getMacSourceValue($data, $signScheme, true);
+        $message = self::getMacSourceValue($data, true);
         $signature = hex2bin($data['P_SIGN']);
         $publicKeyId = openssl_get_publickey($certificate);
 
         return openssl_verify($message, $signature, $publicKeyId, self::ALGO);
     }
 
-    public static function getMacSourceValue(array $data, $signScheme = 'MAC_EXTENDED', $isResponse = false)
+    public static function getMacSourceValue(array $data, $isResponse = false)
     {
-        $macFields = $isResponse ? self::$responseMacFields : self::$requestMacFields;
-
         $type = $data['TRTYPE'];
+        $macFields = $isResponse ? self::$responseMacFields : self::$requestMacFields;
+        $macFields = $macFields[$type] ?? $macFields['default'];
+
         $message = '';
 
-        foreach ($macFields[$signScheme][$type] as $field) {
-            if ($signScheme == 'MAC_EXTENDED' && $data[$field] == '') {
+        foreach ($macFields as $field) {
+            if ($data[$field] == '') {
                 $message .= '-';
             } else {
                 $message .= strlen($data[$field]) . $data[$field];

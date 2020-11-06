@@ -28,7 +28,8 @@
         "php": "^7",
         "omnipay/common": "^3",
         "ext-openssl": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ramsey/uuid": "^4.1"
     },
     "require-dev": {
         "omnipay/tests": "^3"

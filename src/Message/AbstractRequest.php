@@ -6,11 +6,25 @@ namespace Omnipay\Borica\Message;
 
 use Omnipay\Borica\Signature;
 use Omnipay\Common\Exception\InvalidRequestException;
+use Ramsey\Uuid\Uuid;
 
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
     protected $liveEndpoint = 'https://3dsgate.borica.bg/cgi-bin/cgi_link';
     protected $testEndpoint = 'https://3dsgate-dev.borica.bg/cgi-bin/cgi_link';
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(array $parameters = array())
+    {
+        parent::initialize($parameters);
+
+        $this->setParameter('nonce', Uuid::uuid1()->toString());
+        $this->setParameter('timestamp', gmdate('YmdHis'));
+
+        return $this;
+    }
 
     /**
      * @return array|mixed
@@ -24,7 +38,8 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
         return [
             'TERMINAL' => $this->getTerminalId(),
-            'TIMESTAMP' => gmdate('YmdHis'),
+            'TIMESTAMP' => $this->getParameter('timestamp'),
+            'NONCE' => $this->getParameter('nonce'),
         ];
     }
 
@@ -88,16 +103,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('order', $value);
     }
 
-    public function getNonce()
-    {
-        return $this->getParameter('nonce');
-    }
-
-    public function setNonce($value)
-    {
-        return $this->setParameter('nonce', $value);
-    }
-
     public function getMerchant()
     {
         return $this->getParameter('merchant');
@@ -108,19 +113,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('merchant', $value);
     }
 
-    public function getSignScheme()
-    {
-        return $this->getParameter('signScheme');
-    }
-
-    public function setSignScheme($value)
-    {
-        return $this->setParameter('signScheme', $value);
-    }
-
     protected function sign($data)
     {
-        $message = Signature::getMacSourceValue($data, $this->getSignScheme());
+        $message = Signature::getMacSourceValue($data);
 
         return Signature::create($message, $this->getPrivateKey());
     }

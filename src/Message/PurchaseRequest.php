@@ -12,17 +12,16 @@ class PurchaseRequest extends AbstractRequest
     {
         $data = parent::getData();
 
-        $this->validate('amount', 'currency', 'order', 'description', 'merchantUrl', 'returnUrl');
+        $this->validate('amount', 'currency', 'order', 'description', 'merchant', 'merchantUrl');
 
         $data = array_merge($data, [
             'TRTYPE' => 1,
             'AMOUNT' => $this->getAmount(),
             'CURRENCY' => $this->getCurrency(),
             'MERCH_URL' => $this->getMerchantUrl(),
+            'MERCH_NAME' => $this->getMerchantName() ?: $this->getMerchantUrl(),
             'MERCHANT' => $this->getMerchant() ?: $this->getMerchantUrl(),
-            'MERCHANT_NAME' => $this->getMerchantName() ?: $this->getMerchantUrl(),
             'BACKREF' => $this->getReturnUrl(),
-            'NONCE' => $this->getNonce() ?: bin2hex(microtime(true)),
             'ORDER' => $this->getOrder(),
             'DESC' => $this->getDescription(),
             'AD.CUST_BOR_ORDER_ID' => $this->getOrder() . '|' . $this->getOrderId(),

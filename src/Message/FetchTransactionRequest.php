@@ -62,6 +62,8 @@ class FetchTransactionRequest extends AbstractRequest
      */
     public function sendData($data)
     {
+        // TODO: remove this when v2.2 id deprecated
+        $responseCodeField = $this->getTestMode() ? 'RC' : 'responseCode';
         $data['P_SIGN'] = $this->sign($data);
 
         $response = $this->httpClient->request(
@@ -75,7 +77,7 @@ class FetchTransactionRequest extends AbstractRequest
 
         $responseContents = $response->getBody()->getContents();
         $responseData = json_decode($responseContents, true);
-        if (($responseData['responseCode'] ?? '') == -24) {
+        if (($responseData[$responseCodeField] ?? '') == -24) {
             $this->invalidResponseData = $responseData;
             throw new InvalidResponseException('Gateway cache expired', -24);
         }
@@ -94,7 +96,7 @@ class FetchTransactionRequest extends AbstractRequest
             }
         }
 
-        if ($responseData['responseCode'] == self::GUARD_TIME_CHECK_CODE) {
+        if ($responseData[$responseCodeField] == self::GUARD_TIME_CHECK_CODE) {
             try {
                 $originalTimestamp = Uuid::fromString($responseData['nonce'])->getDateTime()->getTimestamp();
             } catch (\Exception $e) {
@@ -103,8 +105,8 @@ class FetchTransactionRequest extends AbstractRequest
             
             if ((time() - $originalTimestamp) > self::GUARD_TIME) {
 //                throw new InvalidResponseException('Gateway guard time expired', self::GUARD_TIME_CHECK_CODE);
-                $responseData['responseCode'] = -17;
-                $responseData['statusMsg'] = 'Gateway guard time expired (' . self::GUARD_TIME . ' sec)';
+                $responseData[$responseCodeField] = -17;
+                $responseData['STATUSMSG'] = 'Gateway guard time expired (' . self::GUARD_TIME . ' sec)';
             }
         }
 
@@ -113,7 +115,7 @@ class FetchTransactionRequest extends AbstractRequest
             'ORDER' => $this->getOrder(),
             'DESC' => $this->getDescription(),
             'MERCHANT' => $this->getMerchant(),
-            'card' => $responseData['card'] ?? $this->getCard(),
+            'CARD' => $responseData['CARD'] ?? $this->getCard(),
         ]);
 
         return $this->response = new FetchTransactionResponse($this, $data);

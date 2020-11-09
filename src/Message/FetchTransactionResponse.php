@@ -27,6 +27,11 @@ class FetchTransactionResponse extends AbstractResponse
 
     public function getCode()
     {
+        if (isset($this->data['RC'])) {
+            return $this->data['RC'];
+        }
+
+        // TODO: remove this when v2.2 id deprecated
         return $this->data['responseCode'] ?? null;
     }
 

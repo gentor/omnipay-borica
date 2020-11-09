@@ -17,7 +17,7 @@ use Omnipay\Common\Message\RequestInterface;
  * @method RequestInterface updateCard(array $options = array())
  * @method RequestInterface deleteCard(array $options = array())
  *
- * @see https://3dsgate-dev.borica.bg/P-OM-41_BORICA_eCommerce_CGI_interface_v2.2.pdf
+ * @see https://3dsgate-dev.borica.bg/P-OM-41_BORICA_eCommerce_CGI_interface_v2.3.pdf
  */
 class Gateway extends AbstractGateway
 {

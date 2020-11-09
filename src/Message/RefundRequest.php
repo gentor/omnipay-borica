@@ -80,8 +80,8 @@ class RefundRequest extends FetchTransactionRequest
 
         if (!empty($error[1])) {
             return $this->response = new FetchTransactionResponse($this, array_merge($result, [
-                'responseCode' => $result['RC'],
-                'statusMsg' => $error[1],
+                'RC' => $result['RC'],
+                'STATUSMSG' => $error[1],
             ]));
         }
 
@@ -91,6 +91,7 @@ class RefundRequest extends FetchTransactionRequest
             'ORDER' => $this->getOrder(),
             'NONCE' => $data['NONCE'],
             'TRAN_TRTYPE' => self::TR_TYPE,
+            'CARD' => $data['CARD'] ?? null,
         ];
 
         parent::setTransactionType(self::TR_TYPE);

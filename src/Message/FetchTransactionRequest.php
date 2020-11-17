@@ -62,8 +62,7 @@ class FetchTransactionRequest extends AbstractRequest
      */
     public function sendData($data)
     {
-        // TODO: remove this when v2.2 id deprecated
-        $responseCodeField = $this->getTestMode() ? 'RC' : 'responseCode';
+        $responseCodeField = 'RC';
         $data['P_SIGN'] = $this->sign($data);
 
         $response = $this->httpClient->request(
@@ -98,7 +97,7 @@ class FetchTransactionRequest extends AbstractRequest
 
         if ($responseData[$responseCodeField] == self::GUARD_TIME_CHECK_CODE) {
             try {
-                $originalTimestamp = Uuid::fromString($responseData['nonce'])->getDateTime()->getTimestamp();
+                $originalTimestamp = Uuid::fromString($responseData['NONCE'])->getDateTime()->getTimestamp();
             } catch (\Exception $e) {
                 $originalTimestamp = time();
             }

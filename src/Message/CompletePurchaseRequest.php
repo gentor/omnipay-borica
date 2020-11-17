@@ -6,6 +6,7 @@ namespace Omnipay\Borica\Message;
 
 use Omnipay\Borica\Signature;
 use Omnipay\Common\Exception\InvalidRequestException;
+use Omnipay\Common\Exception\InvalidResponseException;
 
 class CompletePurchaseRequest extends FetchTransactionRequest
 {
@@ -66,6 +67,7 @@ class CompletePurchaseRequest extends FetchTransactionRequest
      * @param mixed $data
      * @return FetchTransactionResponse
      * @throws InvalidRequestException
+     * @throws InvalidResponseException
      */
     public function sendData($data)
     {

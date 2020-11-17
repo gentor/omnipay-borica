@@ -4,6 +4,8 @@
 namespace Omnipay\Borica\Message;
 
 
+use Omnipay\Common\Exception\InvalidResponseException;
+
 class RefundRequest extends FetchTransactionRequest
 {
     const TR_TYPE = 24;
@@ -61,6 +63,7 @@ class RefundRequest extends FetchTransactionRequest
     /**
      * @param mixed $data
      * @return FetchTransactionResponse
+     * @throws InvalidResponseException
      */
     public function sendData($data)
     {

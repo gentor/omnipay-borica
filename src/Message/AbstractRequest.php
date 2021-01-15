@@ -20,7 +20,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         parent::initialize($parameters);
 
-        $this->setParameter('nonce', Uuid::uuid1()->toString());
+        $this->setParameter('nonce', strtoupper(Uuid::uuid1()->getHex()));
         $this->setParameter('timestamp', gmdate('YmdHis'));
 
         return $this;

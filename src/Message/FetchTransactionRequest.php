@@ -14,6 +14,7 @@ class FetchTransactionRequest extends AbstractRequest
     const TR_TYPE = 90;
     const GUARD_TIME = 900;
     const GUARD_TIME_CHECK_CODE = -40;
+    const USER_CANCEL_CHECK_CODE = -25;
 
     protected $invalidResponseData = [];
 
@@ -63,19 +64,24 @@ class FetchTransactionRequest extends AbstractRequest
     public function sendData($data)
     {
         $responseCodeField = 'RC';
-        $data['P_SIGN'] = $this->sign($data);
+        if (($data[$responseCodeField] ?? '') == self::USER_CANCEL_CHECK_CODE) {
+            $responseData = $data;
+        } else {
+            $data['P_SIGN'] = $this->sign($data);
 
-        $response = $this->httpClient->request(
-            'POST',
-            $this->getEndpoint(),
-            [
-                'Content-type' => 'application/x-www-form-urlencoded',
-            ],
-            http_build_query($data)
-        );
+            $response = $this->httpClient->request(
+                'POST',
+                $this->getEndpoint(),
+                [
+                    'Content-type' => 'application/x-www-form-urlencoded',
+                ],
+                http_build_query($data)
+            );
 
-        $responseContents = $response->getBody()->getContents();
-        $responseData = json_decode($responseContents, true);
+            $responseContents = $response->getBody()->getContents();
+            $responseData = json_decode($responseContents, true);
+        }
+
         if (($responseData[$responseCodeField] ?? '') == -24) {
             $this->invalidResponseData = $responseData;
             throw new InvalidResponseException('Gateway cache expired', -24);
@@ -101,7 +107,7 @@ class FetchTransactionRequest extends AbstractRequest
             } catch (\Exception $e) {
                 $originalTimestamp = time();
             }
-            
+
             if ((time() - $originalTimestamp) > self::GUARD_TIME) {
 //                throw new InvalidResponseException('Gateway guard time expired', self::GUARD_TIME_CHECK_CODE);
                 $responseData[$responseCodeField] = -17;

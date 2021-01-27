@@ -10,6 +10,8 @@ use Omnipay\Common\Exception\InvalidResponseException;
 
 class CompletePurchaseRequest extends FetchTransactionRequest
 {
+    const RETURN_RESPONSE_CODES = [-17, -25];
+
     protected $validTRTYPE = 1;
 
     protected $gatewayData = [];
@@ -72,7 +74,11 @@ class CompletePurchaseRequest extends FetchTransactionRequest
     public function sendData($data)
     {
         $this->validateGatewayData();
-        
+
+        if (in_array($data['RC'], self::RETURN_RESPONSE_CODES)) {
+            return $this->response = new FetchTransactionResponse($this, $data);
+        }
+
         return parent::sendData($data);
     }
 }

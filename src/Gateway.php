@@ -3,6 +3,7 @@
 namespace Omnipay\Borica;
 
 
+use Omnipay\Borica\Message\PayByTokenRequest;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Common\Message\AbstractRequest;
 use Omnipay\Common\Message\NotificationInterface;
@@ -17,7 +18,7 @@ use Omnipay\Common\Message\RequestInterface;
  * @method RequestInterface updateCard(array $options = array())
  * @method RequestInterface deleteCard(array $options = array())
  *
- * @see https://3dsgate-dev.borica.bg/P-OM-41_BORICA_eCommerce_CGI_interface_v2.3.pdf
+ * @see https://3dsgate-dev.borica.bg/P-OM-41_BORICA_eCommerce_CGI_interface_v3.0_EN.pdf
  */
 class Gateway extends AbstractGateway
 {
@@ -119,6 +120,15 @@ class Gateway extends AbstractGateway
     public function refund(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Borica\Message\RefundRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return PayByTokenRequest
+     */
+    public function payByToken(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\PayByTokenRequest', $parameters);
     }
 
     public function __call($name, $arguments)

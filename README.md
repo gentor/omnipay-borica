@@ -1,13 +1,15 @@
 # Omnipay: Borica
 
-**[Borica Way4](https://www.openwaygroup.com/new-blog/2018/11/1/the-migration-to-the-way4-card-payment-system-is-underway) gateway for Omnipay payment processing library**
+**[Borica Way4](https://www.openwaygroup.com/new-blog/2018/11/1/the-migration-to-the-way4-card-payment-system-is-underway)
+gateway for Omnipay payment processing library**
 
-[Omnipay](https://github.com/thephpleague/omnipay) is a framework agnostic, multi-gateway payment
-processing library for PHP. This package implements Borica Way4 support for Omnipay.
+[Omnipay](https://github.com/thephpleague/omnipay) is a framework agnostic, multi-gateway payment processing library for
+PHP. This package implements Borica Way4 support for Omnipay.
 
 ## Installation
 
-Omnipay is installed via [Composer](http://getcomposer.org/). To install, simply require `league/omnipay` and `gentor/omnipay-borica` with Composer:
+Omnipay is installed via [Composer](http://getcomposer.org/). To install, simply require `league/omnipay`
+and `gentor/omnipay-borica` with Composer:
 
 ```
 composer require league/omnipay gentor/omnipay-borica
@@ -16,6 +18,7 @@ composer require league/omnipay gentor/omnipay-borica
 ## Basic Usage
 
 ### Purchase
+
 ```php
 $gateway = Omnipay::create('Borica');
 
@@ -27,12 +30,12 @@ $gateway->setTerminalId($config['terminalId'])
 
 $response = $gateway->purchase(
     [
-        "amount" => "10",
+        'amount' => "10",
         'order' => date('His'),
         'orderId' => uniqid(),
-        "description" => "Borica Test Purchase",
-        "merchantUrl" => "http://borica.way4",
-        "returnUrl" => "http://borica.way4/return.php"
+        'description' => "Borica Test Purchase",
+        'merchantUrl' => "http://borica.way4",
+        'returnUrl' => "http://borica.way4/return.php"
     ]
 )->send();
 
@@ -50,6 +53,7 @@ if ($response->isSuccessful()) {
 ```
 
 ### Complete Purchase
+
 ```php
 $response = $gateway->completePurchase($_POST)->send();
 
@@ -61,6 +65,7 @@ var_dump($response->getMessage());
 ```
 
 ### Refund
+
 ```php
 $response = $gateway->refund([
     'order' => date('His'),
@@ -80,6 +85,7 @@ var_dump($response->getMessage());
 ```
 
 ### Fetch Transaction
+
 ```php
 $response = $gateway->fetchTransaction([
     'order' => date('His'),
@@ -93,5 +99,27 @@ var_dump($response->isReversal());
 var_dump($response->getCode());
 var_dump($response->getMessage());
 var_dump($response->getTransactionReference());
+
+```
+
+### Pay By Token
+
+```php
+$response = $gateway->payByToken([
+    'amount' => "10",
+    'order' => date('His'),
+    'orderId' => uniqid(),
+    'description' => "Borica Test Purchase",
+    'merchantUrl' => "http://borica.way4",
+    'MERCH_TRAN_STATE' => 'M',
+    'MERCH_TOKEN_ID' => 'EC**********57',
+    'MERCH_RN_ID' => '162********440',
+])->send();
+
+print_r($response->getData());
+print_r($response->isSuccessful());
+print_r($response->getCode());
+print_r($response->getMessage());
+print_r($response->getTransactionReference());
 
 ```

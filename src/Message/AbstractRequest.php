@@ -12,6 +12,13 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
     protected $liveEndpoint = 'https://3dsgate.borica.bg/cgi-bin/cgi_link';
     protected $testEndpoint = 'https://3dsgate-dev.borica.bg/cgi-bin/cgi_link';
+    protected $TOKENIZATION = [
+        'MK_TOKEN',
+        'MERCH_TRAN_STATE',
+        'MERCH_RN_ID',
+        'MERCH_TOKEN_ID',
+        'M_INFO',
+    ];
 
     /**
      * @inheritDoc
@@ -22,6 +29,12 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
         $this->setParameter('nonce', strtoupper(Uuid::uuid1()->getHex()));
         $this->setParameter('timestamp', gmdate('YmdHis'));
+
+        foreach ($parameters as $key => $value) {
+            if (in_array($key, $this->TOKENIZATION)) {
+                $this->setParameter($key, $value);
+            }
+        }
 
         return $this;
     }

@@ -28,6 +28,13 @@ class PurchaseRequest extends AbstractRequest
             'ADDENDUM' => 'AD,TD',
         ]);
 
+        if ($this->getParameter('MERCH_TRAN_STATE')) {
+            $data['MERCH_TRAN_STATE'] = $this->getParameter('MERCH_TRAN_STATE');
+            $data['MK_TOKEN'] = $this->getParameter('MK_TOKEN') ?? 'MERCH';
+            $data['MERCH_RN_ID'] = $this->getParameter('MERCH_RN_ID') ??
+                substr(time() . time(), 0, 16);
+        }
+
         $data['P_SIGN'] = $this->sign($data);
 
         return $data;

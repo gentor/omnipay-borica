@@ -14,7 +14,8 @@ class Signature
         'default' => [
             'TERMINAL', 'TRTYPE',
             'AMOUNT', 'CURRENCY',
-            'ORDER', 'MERCHANT',
+            'ORDER',
+//            'MERCHANT',
             'TIMESTAMP', 'NONCE',
         ],
         90 => [

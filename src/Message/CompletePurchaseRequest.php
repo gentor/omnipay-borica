@@ -10,7 +10,7 @@ use Omnipay\Common\Exception\InvalidResponseException;
 
 class CompletePurchaseRequest extends FetchTransactionRequest
 {
-    const RETURN_RESPONSE_CODES = [-25];
+    const RETURN_RESPONSE_CODES = [-25, -2];
 
     protected $validTRTYPE = 1;
 
@@ -23,6 +23,7 @@ class CompletePurchaseRequest extends FetchTransactionRequest
     public function getData()
     {
         parse_str($this->httpRequest->getContent(), $this->gatewayData);
+//        $this->gatewayData = json_decode($this->httpRequest->getContent(), true);
 
         return parent::getData();
     }

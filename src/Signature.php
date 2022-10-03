@@ -10,29 +10,6 @@ class Signature
 {
     const ALGO = OPENSSL_ALGO_SHA256;
 
-    public static $requestMacFields = [
-        'default' => [
-            'TERMINAL', 'TRTYPE',
-            'AMOUNT', 'CURRENCY',
-            'ORDER',
-//            'MERCHANT',
-            'TIMESTAMP', 'NONCE',
-        ],
-        90 => [
-            'TERMINAL', 'TRTYPE',
-            'ORDER', 'NONCE',
-        ],
-    ];
-
-    public static $responseMacFields = [
-        'default' => [
-            'ACTION', 'RC', 'APPROVAL', 'TERMINAL', 'TRTYPE',
-            'AMOUNT', 'CURRENCY', 'ORDER', 'RRN',
-            'INT_REF', 'PARES_STATUS', 'ECI', 'TIMESTAMP',
-            'NONCE',
-        ],
-    ];
-
     public static $csrFields = [
         'commonName',
         'countryName',
@@ -42,48 +19,6 @@ class Signature
         'stateOrProvinceName',
         'organizationalUnitName',
     ];
-
-    public static function create($message, $privateKey)
-    {
-        $privateKeyId = openssl_get_privatekey($privateKey);
-
-        openssl_sign($message, $signature, $privateKeyId, self::ALGO);
-        openssl_free_key($privateKeyId);
-
-        return bin2hex($signature);
-    }
-
-    public static function verify(array $data, $certificate)
-    {
-        if (empty($data['P_SIGN'])) {
-            return -1;
-        }
-
-        $message = self::getMacSourceValue($data, true);
-        $signature = hex2bin($data['P_SIGN']);
-        $publicKeyId = openssl_get_publickey($certificate);
-
-        return openssl_verify($message, $signature, $publicKeyId, self::ALGO);
-    }
-
-    public static function getMacSourceValue(array $data, $isResponse = false)
-    {
-        $type = $data['TRTYPE'];
-        $macFields = $isResponse ? self::$responseMacFields : self::$requestMacFields;
-        $macFields = $macFields[$type] ?? $macFields['default'];
-
-        $message = '';
-
-        foreach ($macFields as $field) {
-            if ($data[$field] == '') {
-                $message .= '-';
-            } else {
-                $message .= strlen($data[$field]) . $data[$field];
-            }
-        }
-
-        return $message;
-    }
 
     /**
      * Generate 2048 bit RSA private and public keys

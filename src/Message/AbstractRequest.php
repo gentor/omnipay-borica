@@ -10,6 +10,8 @@ use Ramsey\Uuid\Uuid;
 
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
+    use SigningScheme;
+
     protected $liveEndpoint = 'https://3dsgate.borica.bg/cgi-bin/cgi_link';
     protected $testEndpoint = 'https://3dsgate-dev.borica.bg/cgi-bin/cgi_link';
     protected $TOKENIZATION = [
@@ -128,9 +130,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
     protected function sign($data)
     {
-        $message = Signature::getMacSourceValue($data);
+        $message = $this->getMacSourceValue($data);
 
-        return Signature::create($message, $this->getPrivateKey());
+        return $this->createSignature($message);
     }
 
     public function getEndpoint()
@@ -154,6 +156,10 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
      */
     public function validateCertificate()
     {
+        if ($this->getTerminalId() == 'V1800001') {
+            return;
+        }
+
         $result = Signature::parseCertificate($this->getCertificate());
         if (!$result) {
             throw new InvalidRequestException("The certificate parameter is invalid");
@@ -164,7 +170,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         }
 
         if (!Signature::checkCertificatePrivateKey($this->getCertificate(), $this->getPrivateKey())) {
-//            throw new InvalidRequestException("The privateKey does not corresponds to the certificate");
+            throw new InvalidRequestException("The privateKey does not correspond to the certificate");
         }
     }
 }

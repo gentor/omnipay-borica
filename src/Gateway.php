@@ -31,10 +31,31 @@ class Gateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return [
+            'signScheme' => 'MAC_ADVANCED',
             'currency' => 'BGN',
             'testMode' => true,
             'gatewayCertificate' => file_get_contents(__DIR__ . '/../resources/MPI_OW_APGW_B-Trust.cer'),
         ];
+    }
+
+    /**
+     * @param boolean $value
+     * @return $this
+     */
+    public function setTestMode($value)
+    {
+        if ($value) {
+            $this->setGatewayCertificate(file_get_contents(__DIR__ . '/../resources/MPI_OW_APGW_B-Trust.cer'));
+        } else {
+            $this->setGatewayCertificate(file_get_contents(__DIR__ . '/../resources/MPI_OW_APGW.cer'));
+        }
+
+        return $this->setParameter('testMode', $value);
+    }
+
+    public function useMacGeneral()
+    {
+        return $this->setParameter('signScheme', 'MAC_GENERAL');
     }
 
     public function getTerminalId()

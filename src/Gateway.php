@@ -11,8 +11,6 @@ use Omnipay\Common\Message\RequestInterface;
 
 /**
  * @method NotificationInterface acceptNotification(array $options = array())
- * @method RequestInterface completeAuthorize(array $options = array())
- * @method RequestInterface capture(array $options = array())
  * @method RequestInterface void(array $options = array())
  * @method RequestInterface createCard(array $options = array())
  * @method RequestInterface updateCard(array $options = array())
@@ -109,6 +107,24 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
+     * @return Message\CompleteAuthorizeRequest|AbstractRequest
+     */
+    public function completeAuthorize(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\CompleteAuthorizeRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return Message\CaptureRequest|AbstractRequest
+     */
+    public function capture(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\CaptureRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
      * @return Message\PurchaseRequest|AbstractRequest
      */
     public function purchase(array $parameters = array())
@@ -155,8 +171,6 @@ class Gateway extends AbstractGateway
     public function __call($name, $arguments)
     {
         // TODO: Implement @method \Omnipay\Common\Message\NotificationInterface acceptNotification(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface completeAuthorize(array $options = array())
-        // TODO: Implement @method \Omnipay\Common\Message\RequestInterface capture(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface void(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
         // TODO: Implement @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())

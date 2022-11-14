@@ -3,6 +3,7 @@
 namespace Omnipay\Borica;
 
 
+use Omnipay\Borica\Message\AuthorizeByTokenRequest;
 use Omnipay\Borica\Message\PayByTokenRequest;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Common\Message\AbstractRequest;
@@ -166,6 +167,15 @@ class Gateway extends AbstractGateway
     public function payByToken(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Borica\Message\PayByTokenRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return AuthorizeByTokenRequest
+     */
+    public function authorizeByToken(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\AuthorizeByTokenRequest', $parameters);
     }
 
     public function __call($name, $arguments)

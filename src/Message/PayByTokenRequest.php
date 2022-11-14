@@ -21,6 +21,8 @@ class PayByTokenRequest extends PurchaseRequest
         unset($data['MK_TOKEN']);
         $data['MERCH_TOKEN_ID'] = $this->getParameter('MERCH_TOKEN_ID');
 
+        $data['P_SIGN'] = $this->sign($data);
+
         return $data;
     }
 

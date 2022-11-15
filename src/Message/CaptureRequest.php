@@ -50,7 +50,7 @@ class CaptureRequest extends AbstractRequest
     {
         return $this->setParameter('RRN', $value);
     }
-    
+
     /**
      * @param mixed $data
      * @return FetchTransactionResponse
@@ -66,7 +66,7 @@ class CaptureRequest extends AbstractRequest
             http_build_query($data)
         );
 
-        $data = json_decode($response->getBody()->getContents(), true);
+        $data = array_merge($data, json_decode($response->getBody()->getContents(), true));
 
         return $this->response = new FetchTransactionResponse($this, $data);
     }

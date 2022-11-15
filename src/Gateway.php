@@ -162,6 +162,15 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
+     * @return Message\CancelRequest|AbstractRequest
+     */
+    public function cancel(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Borica\Message\CancelRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
      * @return PayByTokenRequest
      */
     public function payByToken(array $parameters = array())

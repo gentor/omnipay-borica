@@ -98,6 +98,16 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('gatewayCertificate', $value);
     }
 
+    public function getValidateStatusData()
+    {
+        return $this->getParameter('validateStatusData');
+    }
+
+    public function setValidateStatusData(bool $value)
+    {
+        return $this->setParameter('validateStatusData', $value);
+    }
+
     public function setDesc($value)
     {
         return $this->setDescription($value);

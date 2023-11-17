@@ -33,6 +33,7 @@ class Gateway extends AbstractGateway
             'signScheme' => 'MAC_ADVANCED',
             'currency' => 'BGN',
             'testMode' => true,
+            'validateStatusData' => true,
             'gatewayCertificate' => file_get_contents(__DIR__ . '/../resources/MPI_OW_APGW_B-Trust.cer'),
         ];
     }
@@ -95,6 +96,16 @@ class Gateway extends AbstractGateway
     public function setGatewayCertificate($value)
     {
         return $this->setParameter('gatewayCertificate', $value);
+    }
+
+    public function getValidateStatusData()
+    {
+        return $this->getParameter('validateStatusData');
+    }
+
+    public function setValidateStatusData(bool $value)
+    {
+        return $this->setParameter('validateStatusData', $value);
     }
 
     /**

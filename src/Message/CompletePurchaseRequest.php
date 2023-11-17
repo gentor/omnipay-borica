@@ -76,7 +76,7 @@ class CompletePurchaseRequest extends FetchTransactionRequest
     {
         $this->validateGatewayData();
 
-        if (in_array($this->gatewayData['RC'], self::RETURN_RESPONSE_CODES)) {
+        if (!$this->getValidateStatusData() || in_array($this->gatewayData['RC'], self::RETURN_RESPONSE_CODES)) {
             // Return gateway response directly
             return $this->response = new FetchTransactionResponse($this, $this->gatewayData);
         }

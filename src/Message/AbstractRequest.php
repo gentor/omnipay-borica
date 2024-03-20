@@ -175,9 +175,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             throw new InvalidRequestException("The certificate parameter is invalid");
         }
 
-        if ($result['isExpired']) {
-            throw new InvalidRequestException("The certificate expired on " . $result['validTo']);
-        }
+//        if ($result['isExpired']) {
+//            throw new InvalidRequestException("The certificate expired on " . $result['validTo']);
+//        }
 
         if (!Signature::checkCertificatePrivateKey($this->getCertificate(), $this->getPrivateKey())) {
             throw new InvalidRequestException("The privateKey does not correspond to the certificate");
